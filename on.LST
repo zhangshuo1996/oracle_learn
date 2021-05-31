@@ -1,0 +1,16 @@
+SQL> /
+
+     EMPNO ENAME      JOB              SAL                                      
+---------- ---------- --------- ----------                                      
+      7788 SCOTT      ANALYST         3000                                      
+      7902 FORD       ANALYST         3000                                      
+      7566 JONES      MANAGER         2975                                      
+      7698 BLAKE      MANAGER         2850                                      
+      7782 CLARK      MANAGER         2450                                      
+      7839 KING       PRESIDENT       5000                                      
+      7499 ALLEN      SALESMAN        1600                                      
+      7844 TURNER     SALESMAN        1500                                      
+
+ÒÑÑ¡Ôñ8ÐÐ¡£
+
+SQL> spool off;
