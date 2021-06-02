@@ -216,3 +216,61 @@ from emp_pl
 where job = 'SALESMAN'
 order by sal;
 
+-- MERGE opereation
+-- 6-41
+create table copy_emp
+AS
+select * from emp
+where deptno = 20;
+
+
+-- 6-42
+select * 
+from copy_emp;
+
+-- 6-43
+begin
+    merge into copy_emp c
+        using emp e
+        on (c.empno = e.empno)
+        when matched then
+            update set
+                c.empno    = e.empno, -- error
+                c.ename    = e.ename,
+                c.job      = e.job,
+                c.mgr      = e.mgr,
+                c.hiredate = e.hiredate,
+                c.sal      = e.sal, 
+                c.comm     = e.comm,
+                c.deptno   = e.deptno
+        when not matched then
+            insert values (e.empno, e.ename, e.job, e.mgr,
+                            e.hiredate, e.sal, e.comm, e.deptno);
+END;
+/
+
+-- 6-44
+begin
+    merge into copy_emp c
+        using emp e
+        on (c.empno = e.empno)
+        when matched then
+            update set
+                c.ename    = e.ename,
+                c.job      = e.job,
+                c.mgr      = e.mgr,
+                c.hiredate = e.hiredate,
+                c.sal      = e.sal, 
+                c.comm     = e.comm,
+                c.deptno   = e.deptno
+        when not matched then
+            insert values (e.empno, e.ename, e.job, e.mgr,
+                            e.hiredate, e.sal, e.comm, e.deptno);
+END;
+/
+
+
+-- 6-45
+select * 
+from copy_emp
+order by deptno;
