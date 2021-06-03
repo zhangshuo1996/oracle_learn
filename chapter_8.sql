@@ -51,3 +51,30 @@ END;
 -- 8-8
 select *
 from dept_pl;
+
+-- 8-9
+set serveroutput on
+set verify off
+declare
+    v_empno emp_pl.empno%TYPE;
+    v_deptno emp_pl.deptno%TYPE := &p_deptno;
+    v_sal emp_pl.sal%TYPE := &p_sal;
+    v_hiredate  emp_pl.hiredate%TYPE := SYSDATE;
+    v_job       emp_pl.job%TYPE :='&p_job';
+    v_counter   NUMBER(2) := 1;
+    v_max_num   NUMBER(2) := &p_max_num;
+begin
+    select max(empno) into v_empno 
+    from emp_pl;
+    while v_counter <= v_max_num LOOP
+        INSERT INTO emp_pl(empno, hiredate, job, sal, deptno)
+        VALUES((v_empno + v_counter), v_hiredate, v_job, v_sal, v_deptno);
+        v_counter := v_counter + 1;
+    END LOOP;
+END;
+/
+
+-- 8-10
+select empno, hiredate, job, sal, deptno
+from emp_pl
+where deptno > 20;
