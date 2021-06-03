@@ -67,3 +67,104 @@ begin
     END IF;
 END;
 /
+
+-- 7-13
+set verify off
+set serveroutput on
+declare
+    v_degree char(1) := UPPER('&p_degree');
+    v_description varchar2(250);
+begin
+    v_description := CASE v_degree
+        WHEN 'B' THEN '此人拥有学士学位'
+        WHEN 'M' THEN '此人拥有硕士学位'
+        WHEN 'D' THEN '此人拥有博士学位'
+        ELSE '此人拥有壮士学位'
+    END;   
+    DBMS_OUTPUT.PUT_LINE(v_description);
+END;
+/
+
+
+-- 7-17
+set verify off
+set serveroutput on
+declare
+    v_degree char(1) := UPPER('&p_degree');
+    v_description varchar2(250);
+begin
+    v_description := CASE v_degree
+        WHEN 'B' THEN '此人拥有学士学位'
+        WHEN 'M' THEN '此人拥有硕士学位'
+        WHEN 'D' THEN '此人拥有博士学位'
+        ELSE '此人拥有壮士学位'
+    END;   
+    DBMS_OUTPUT.PUT_LINE(v_description);
+END;
+/
+
+-- 7-18
+set verify off
+set serveroutput on
+declare
+    v_degree char(1) := UPPER('&p_degree');
+begin
+    CASE v_degree
+        WHEN 'B' THEN 
+            DBMS_OUTPUT.PUT_LINE('此人拥有学士学位');
+        WHEN 'M' THEN 
+            DBMS_OUTPUT.PUT_LINE('此人拥有硕士学位');
+        WHEN 'D' THEN
+            DBMS_OUTPUT.PUT_LINE('此人拥有博士学位');
+        ELSE 
+            DBMS_OUTPUT.PUT_LINE('此人拥有壮士学位');
+    END CASE;   
+END;
+/
+
+-- 7-25
+set verify off
+set serveroutput on
+declare
+    v_empno NUMBER := &p_empno;
+    v_ename varchar2(30);
+    v_job emp.job%TYPE;
+    v_sal emp.sal%TYPE;
+begin
+    select job into v_job from emp where empno = v_empno;
+
+    CASE v_job
+        WHEN 'SALESMAN' THEN 
+            select empno, ename, job, sal * 1.5
+            into v_empno, v_ename, v_job, v_sal
+            from emp 
+            where empno = v_empno;
+            DBMS_OUTPUT.PUT_LINE(v_job || ' ' || v_ename || ' 加薪后的工资为 ： ' || v_sal);
+        
+        WHEN 'CLERK' THEN 
+            select empno, ename, job, sal * 1.2
+            into v_empno, v_ename, v_job, v_sal
+            from emp 
+            where empno = v_empno;
+            DBMS_OUTPUT.PUT_LINE(v_job || ' ' || v_ename || ' 加薪后的工资为 ： ' || v_sal);
+        
+        WHEN 'ANALYST' THEN 
+            select empno, ename, job, sal * 1.25
+            into v_empno, v_ename, v_job, v_sal
+            from emp 
+            where empno = v_empno;
+            DBMS_OUTPUT.PUT_LINE(v_job || ' ' || v_ename || ' 加薪后的工资为 ： ' || v_sal);
+        
+        WHEN 'MANGAGER' THEN 
+            select empno, ename, job, sal * 1.40
+            into v_empno, v_ename, v_job, v_sal
+            from emp 
+            where empno = v_empno;
+            DBMS_OUTPUT.PUT_LINE(v_job || ' ' || v_ename || ' 加薪后的工资为 ： ' || v_sal);
+    END CASE;   
+END;
+/
+-- 7-27
+select empno, ename, job, sal
+from emp
+where empno = 7900;
