@@ -105,3 +105,73 @@ BEGIN
     CLOSE emp_cursor;
 END;
 /
+
+
+-- 10-10
+
+set serveroutput on
+declare
+    v_empno     emp.empno%TYPE;
+    v_ename     emp.ename%TYPE;
+    v_job       emp.job%TYPE;
+    v_sal       emp.sal%TYPE;
+
+    CURSOR emp_cursor IS
+        SELECT empno, ename, job, sal
+        from emp
+        ORDER BY sal;
+    
+BEGIN
+    OPEN emp_cursor;
+    LOOP
+        FETCH emp_cursor INTO v_empno, v_ename, v_job, v_sal;
+        EXIT WHEN emp_cursor%ROWCOUNT > 100 OR emp_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE(v_empno || ' ' || v_ename || ' ' || v_job || ' ' || v_sal);
+    END LOOP;
+    CLOSE emp_cursor;
+END;
+/
+
+-- 10-11
+set serveroutput on
+declare
+    
+    CURSOR emp_cursor IS
+        SELECT *
+        from emp;
+    
+    emp_record emp_cursor%ROWTYPE;
+
+    TYPE emp_table_type IS TABLE OF
+        emp%ROWTYPE INDEX BY PLS_INTEGER;
+
+    v_emp_record emp_table_type;
+    n NUMBER(3) := 1;
+    
+BEGIN
+    OPEN emp_cursor;
+    LOOP
+        FETCH emp_cursor INTO emp_record;
+        EXIT WHEN emp_cursor%NOTFOUND;
+        v_emp_record(n) := emp_record; -- 赋值
+        n := n + 1;
+    END LOOP;
+    CLOSE emp_cursor;
+
+    <<Outer_Loop>>
+    FOR i IN v_emp_record.FIRST..v_emp_record.LAST LOOP
+        FOR j IN v_emp_record.FIRST..v_emp_record.LAST LOOP
+            IF v_emp_record(i).empno = v_emp_record(j).mgr
+            THEN
+                DBMS_OUTPUT.PUT_LINE(v_emp_record(i).job || ' ' || ' ' 
+                    || v_emp_record(i).ename || '是真正的经理，不是光杆司令！！！');
+                CONTINUE Outer_Loop;
+            END IF;
+        END LOOP ;
+    END LOOP Outer_Loop;
+END;
+/
+
+-- 10-12
+SELECT empno, ename, job, mgr
+from emp;
