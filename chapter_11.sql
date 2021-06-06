@@ -56,7 +56,7 @@ BEGIN
 END;
 /
 
--- 11-4
+-- 11-5
 set serveroutput on
 declare 
     CURSOR dept_total_cursor IS 
@@ -78,5 +78,93 @@ BEGIN
                             || ' ' || dept_record.max_salary
                             || ' ' || dept_record.emp_total);
     END LOOP;
+END;
+/
+
+-- 11-7
+set serveroutput on
+declare
+    CURSOR emp_cursor (p_deptno NUMBER, p_job VARCHAR2) IS
+        select * FROM emp_pl
+        where deptno = p_deptno AND job = p_job
+        ORDER BY empno;
+    
+    v_emp_record emp_cursor%ROWTYPE;
+
+BEGIN
+    -- OPEN emp_cursor(20, 'ANALYST');
+    -- LOOP
+    --     FETCH emp_cursor INTO v_emp_record;
+    --     EXIT WHEN emp_cursor%NOTFOUND OR
+    --                 emp_cursor%NOTFOUND IS NULL;
+    --     DBMS_OUTPUT.PUT_LINE(v_emp_record.empno || ' ' ||
+    --                         v_emp_record.ename || ' ' ||
+    --                         v_emp_record.job || ' ' ||
+    --                         v_emp_record.sal || ' ' ||
+    --                         v_emp_record.deptno);
+    -- END LOOP;
+    -- CLOSE emp_cursor;
+
+    FOR emp_record IN emp_cursor(70, '保安') LOOP
+        DBMS_OUTPUT.PUT_LINE(v_emp_record.empno || ' ' ||
+                            v_emp_record.ename || ' ' ||
+                            v_emp_record.job || ' ' ||
+                            v_emp_record.sal || ' ' ||
+                            v_emp_record.deptno);
+    END LOOP;
+END;
+/
+
+
+-- 11-8  
+declare 
+    CURSOR emp_cursor IS
+        SELECT empno, ename, sal
+        FROM emp_pl
+        where deptno = 70
+        FOR UPDATE OF sal NOWAIT;
+
+BEGIN
+    OPEN emp_cursor;
+END;
+/
+
+-- 11-9 使用新的会话执行
+UPDATE emp_pl
+set sal = 3838
+WHEREdeptno = 70;
+
+
+-- 11-11
+SELECT empno, ename, job, sal, deptno
+FROM emp_pl
+WHERE deptno = 70;
+
+
+-- 11-13
+UPDATE emp_pl
+set sal = 8888
+WHERE empno = 7936;
+
+
+-- 11-15
+SELECT empno, ename, job, sal, deptno
+FROM emp_pl
+WHERE deptno = 70;
+
+
+-- 11-16
+declare
+    CURSOR emp_cursor IS
+        SELECT * FROM emp_pl
+        WHERE deptno = 70
+        FOR UPDATE OF sal NOWAIT;
+BEGIN
+    FOR emp_record IN emp_cursor LOOP
+        UPDATE emp_pl
+        SET sal = emp_record.sal * 0.15
+        WHERE CURRENT OF emp_cursor; -- 更新当前行
+    END LOOP;
+    COMMIT;
 END;
 /
