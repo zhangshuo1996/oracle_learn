@@ -48,7 +48,7 @@ EXECUTE dept_pkg.add_dept('保安', '威虎山')
 
 
 -- 16-13
-CREATE OR REPLACE PACKAGE  BODY salary_pkg 
+CREATE OR REPLACE PACKAGE BODY salary_pkg 
 IS
     PROCEDURE reset_salary(p_new_sal NUMBER, p_grade NUMBER)
     IS 
@@ -140,6 +140,137 @@ IS
     END validate;
 
     BEGIN 
-        SELECT AVG(sal)
+        SELECT AVG(sal) INTO v_std_salary
+        FROM emp;
 END salary_pkg;
 /
+
+-- 16-17
+SET serveroutput ON
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(salary_pkg.v_std_salary);
+END;
+/
+
+-- 16-18
+SELECT AVG(sal)
+FROM emp;
+
+-- 16-19
+CREATE OR REPLACE PACKAGE dept_bi 
+IS
+    FUNCTION average_salary(p_deptno IN NUMBER) RETURN NUMBER;
+    FUNCTION employee_num(p_deptno IN NUMBER) RETURN NUMBER;
+END dept_bi;
+/
+
+
+-- 16-20
+CREATE OR REPLACE PACKAGE BODY dept_bi
+IS
+    FUNCTION average_salary(p_deptno IN NUMBER) RETURN NUMBER
+    IS
+        v_average_sal emp.sal%TYPE;
+    BEGIN
+        SELECT AVG(sal) INTO  v_average_sal
+        FROM emp 
+        WHERE deptno = p_deptno;
+        RETURN v_average_sal;
+    END average_salary;
+
+    FUNCTION employee_num(p_deptno IN NUMBER) RETURN NUMBER 
+    IS
+        v_emp_num NUMBER(8);
+    BEGIN
+        SELECT COUNT(*) INTO v_emp_num
+        FROM emp
+        WHERE deptno = p_deptno;
+        RETURN v_emp_num;
+    END employee_num;
+END dept_bi;
+/
+
+-- 16-21
+SELECT deptno, dname, dept_bi.average_salary(20) "AVERAGE Salary",
+        dept_bi.employee_num(20) "Emploee Number"
+FROM dept
+WHERE deptno = 20;
+
+-- 16-22
+SELECT deptno, AVG(sal), COUNT(*)
+FROM emp
+GROUP BY deptno;
+
+
+-- 16-23
+SELECT deptno, dname, 
+    dept_bi.average_salary(deptno) "AVERAGE Salary",
+    dept_bi.employee_num(deptno) "Emploee Number"
+FROM dept;
+
+-- 16-24
+SELECT * FROM salgrade
+
+-- 16-25
+SET serveroutput ON
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(salary_pkg.v_std_salary);
+END;
+/
+
+-- 16-26
+EXECUTE salary_pkg.reset_salary(888, 1);
+
+
+-- 16-27
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(salary_pkg.v_std_salary);
+END;
+/
+
+-- 16-28
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(scott.salary_pkg.v_std_salary);
+END;
+/
+
+-- 16-29
+UPDATE scott.salgrade
+SET losal = 900
+WHERE grade = 1;
+
+
+-- 16-30
+SELECT *
+FROM scott.salgrade;
+
+
+-- 16-31
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(scott.salary_pkg.v_std_salary);
+END;
+/
+
+
+-- 16-32
+EXECUTE scott.salary_pkg.reset_salary(938, 1);
+
+-- 16-33
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(scott.salary_pkg.v_std_salary);
+END;
+/
+
+-- 16-34
+EXECUTE scott.salary_pkg.reset_salary(898, 1);
+
+-- 16-35
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(salary_pkg.v_std_salary);
+END;
+/
+
+-- 16-36
+SELECT * FROM salgrade;
+
+
