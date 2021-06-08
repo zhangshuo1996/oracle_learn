@@ -32,4 +32,28 @@ BEFORE INSERT OR UPDATE OR DELETE ON emp_pl
         THEN
             IF DELETING THEN
                 RAISE_APPLICATION_ERROR(-20038, '操作已经记录在系统中， 非工作时间不允许删除数据');
-                ELSIF INSERTING THEN
+            ELSIF INSERTING THEN
+                RAISE_APPLICATION_ERROR(-20038, '操作已经记录在系统中， 非工作时间不允许插入数据');
+            ELSIF UPDATING ('SAL') THEN
+                RAISE_APPLICATION_ERROR(-20038, '操作已经记录在系统中， 非工作时间不允许更新数据');
+            ELSE
+                RAISE_APPLICATION_ERROR(-20038, '操作已经记录在系统中， 非工作时间不允许修改数据');
+            END IF;
+        END IF;
+    END;
+/
+
+-- 17-6 7 8 9
+DELETE emp_pl
+WHERE deptno = 20;
+
+INSERT INTO emp_pl(empno, ename, hiredate, job, sal)
+VALUES(3838, ' xx ', SYSDATE, '销售经理', 9999);
+
+
+UPDATE emp_pl
+SET sal = 1748;
+
+
+UPDATE emp_pl
+SET job = 'CEO';

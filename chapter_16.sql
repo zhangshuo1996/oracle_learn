@@ -274,3 +274,131 @@ END;
 SELECT * FROM salgrade;
 
 
+-- 16-38
+BEGIN   
+    DBMS_OUTPUT.PUT_LINE(salary_pkg.v_std_salary);
+END;
+/
+
+-- 16-39
+SELECT *
+FROM salgrade;
+
+
+-- 16-42
+EXECUTE salary_pkg.reset_salary(789, 1);
+
+-- 16-43
+SET serverout ON
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(salary_pkg.v_std_salary);
+END;
+/
+
+
+-- 16-44
+CREATE OR REPLACE PACKAGE employee_pkg 
+IS
+    PROCEDURE open_emp;
+    FUNCTION next_employee(p_n NUMBER := 1) RETURN BOOLEAN;
+    PROCEDURE close_emp;
+END employee_pkg;
+/
+
+
+-- 16-45
+CREATE OR REPLACE PACKAGE BODY employee_pkg 
+IS
+    CURSOR emp_cursor 
+    IS
+        SELECT empno FROM emp;
+    
+    PROCEDURE open_emp IS
+    BEGIN 
+        IF NOT emp_cursor%ISOPEN
+        THEN
+            OPEN emp_cursor;
+        END IF;
+    END open_emp;
+     
+    FUNCTION next_employee(p_n NUMBER := 1) RETURN BOOLEAN
+    IS
+        v_emp_id emp.empno%TYPE;
+    BEGIN
+        FOR count IN 1..p_n LOOP    
+            FETCH emp_cursor INTO v_emp_id;
+            EXIT WHEN emp_cursor%NOTFOUND;
+            DBMS_OUTPUT.PUT_LINE('Employee NUMBER: ' || (v_emp_id));
+        END LOOP;
+        RETURN emp_cursor%FOUND;
+    END next_employee;
+
+    PROCEDURE close_emp 
+    IS
+    BEGIN   
+        IF emp_cursor%ISOPEN 
+        THEN
+            CLOSE emp_cursor;
+        END IF;
+    END close_emp;
+END employee_pkg;
+/
+
+
+-- 16-46 --47
+SET serveroutput ON
+
+EXECUTE employee_pkg.open_emp
+
+-- 16-48
+DECLARE 
+    more_rows BOOLEAN := employee_pkg.next_employee(5);
+BEGIN
+    IF NOT more_rows 
+    THEN
+        employee_pkg.close_emp;
+    END IF;
+END;
+/
+
+
+-- 16-52
+CREATE OR REPLACE PACKAGE employee_dog 
+IS
+    TYPE emp_table_type IS TABLE OF emp%ROWTYPE
+        INDEX BY PLS_INTEGER;
+    PROCEDURE get_emp(p_emps OUT emp_table_type);
+END employee_dog;
+/
+
+
+-- 16-53
+CREATE OR REPLACE PACKAGE BODY employee_dog 
+IS
+    PROCEDURE get_emp(p_emps OUT emp_table_type) 
+    IS  
+        v_count BINARY_INTEGER := 1;
+    BEGIN
+        FOR emp_record IN (SELECT * FROM emp)
+        LOOP    
+            p_emps(v_count) := emp_record;
+            v_count := v_count + 1;
+        END LOOP;
+    END get_emp;
+END employee_dog;
+/
+
+
+-- 16-54
+SET serveroutput ON
+DECLARE
+    employees employee_dog.emp_table_type;
+BEGIN
+    employee_dog.get_emp(employees);
+
+    FOR i IN 1..8 LOOP
+        DBMS_OUTPUT.PUT_LINE('Emp ' || i || ': ' || employees(i).ename || ' ' || employees(i).job 
+                            || ' ' || employees(i).sal);
+    END LOOP;
+END;
+/
